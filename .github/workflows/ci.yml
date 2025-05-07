@@ -2,18 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  push:
+    branches: [ master ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ master ]
 
 jobs:
   release-create:
     name: Create Release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
@@ -21,71 +19,53 @@ jobs:
     - name: Set Env
       run: |
         echo "RELEASE_NAME=${GITHUB_REF_NAME} / $(git show -s --format=%cs)" >> ${GITHUB_ENV}
+    - name: Check Version Match
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: |
+        pip install --upgrade pip
+        pip install toml
+        python .github/check_version.py
     - name: Create Release
-      run: gh release create "${GITHUB_REF_NAME}" --title "${{ env.RELEASE_NAME }}" --generate-notes --draft
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: |
+        gh release create "${GITHUB_REF_NAME}" --title "${{ env.RELEASE_NAME }}" --generate-notes --draft
+        sleep 10
       env:
-        GITHUB_TOKEN: ${{ github.TOKEN }}
+        GH_TOKEN: ${{ github.token }}
 
   build-and-test:
-    needs: ${{ startsWith(github.ref, 'refs/tags/v') && 'release-create' || '' }}
+    needs: release-create
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         python-version: ["2.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        container:
-          image: python:${{ matrix.python-version }}-slim
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
-    - name: Install dependencies
+    - name: Build-And-Test
+      uses: addnab/docker-run-action@v3
+      with:
+        image: python:${{ matrix.python-version }}-slim
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          cd /workspace
+          python -m pip install --upgrade pip
+          pip install -e .
+          bash ./build.sh
+          pip install dist/*.whl
+
+    - name: Show Dist
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-        apt-get update
-        apt-get install -y gh
-    
-    - name: Run tests
-      run: |
-        pytest tests/
-    
-    - name: Build package (Python 2.7)
-      if: matrix.python-version == '2.7'
-      run: |
-        python -m build --no-isolation --wheel
-    
-    - name: Build package (Python 3.x)
-      if: matrix.python-version != '2.7'
-      run: |
-        python -m build
-    
-    - name: Verify package
-      run: |
-        pip install dist/*.whl
+        ls -la dist
+      env:
+        GH_TOKEN: ${{ github.token }}
 
     - name: Upload Release
       if: startsWith(github.ref, 'refs/tags/v') && (matrix.python-version == '2.7' || matrix.python-version == '3.13')
       run: |
-        gh release upload "${GITHUB_REF_NAME}" dist/*.whl
+        gh release upload "${GITHUB_REF_NAME}" dist/*
       env:
-        GITHUB_TOKEN: ${{ github.TOKEN }}
-
-  upload-to-pypi:
-    needs: build-and-test
-    if: false # startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download from Release
-      run: |
-        gh release download "${GITHUB_REF_NAME}" --dir dist
-      env:
-        GITHUB_TOKEN: ${{ github.TOKEN }}
-
-    - name: Upload to PyPI
-      run: |
-        python -m pip install --upgrade pip
-        pip install twine
-        python -m twine upload dist/*
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        GH_TOKEN: ${{ github.token }}

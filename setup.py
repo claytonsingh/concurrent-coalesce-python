@@ -17,7 +17,7 @@ setup(
     install_requires=project["dependencies"],
     classifiers=project["classifiers"],
     keywords=project["keywords"],
-    license=project["license"],
+    license=project["license"]["text"],
     url=project["urls"]["Homepage"],
     project_urls=project["urls"],
 )

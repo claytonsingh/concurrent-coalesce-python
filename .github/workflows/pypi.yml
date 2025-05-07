@@ -1,0 +1,26 @@
+name: PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload-to-pypi:
+    runs-on: ubuntu-latest
+    environment: publish
+    permissions:
+      contents: read
+      id-token: write
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+    - name: Download dist
+      run: |
+        mkdir dist
+        echo "Downloading release ${GITHUB_REF_NAME}"
+        gh release download "${GITHUB_REF_NAME}" --repo ${{ github.repository }} --dir dist
+      env:
+        GH_TOKEN: ${{ github.token }}
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages_dir: dist/

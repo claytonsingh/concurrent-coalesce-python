@@ -13,7 +13,7 @@ authors = [
 description = "A decorator that coalesces concurrent function calls"
 readme = "README.md"
 keywords = ["concurrent", "coalesce", "decorator", "function", "calls"]
-license = "MIT"
+license = { text = "MIT License" }
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 2.7",
