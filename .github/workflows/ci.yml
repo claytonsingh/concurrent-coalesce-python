@@ -55,6 +55,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
           bash ./build.sh
+          python -m pytest
           pip install dist/*.whl
 
     - name: Show Dist
