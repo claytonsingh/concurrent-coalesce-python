@@ -1,4 +1,4 @@
-from concurrent_coalesce.core import coalesce
+from concurrent_coalesce.core import coalesce, ASYNC_SUPPORTED
 import sys
 
 if sys.version_info.major == 2:

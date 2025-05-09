@@ -8,5 +8,6 @@ toml
 # Testing
 pytest>=4.6.0,<7.0.0  # Last version supporting Python 2.7
 pytest-cov>=2.12.1
+pytest-asyncio>=0.18.0;python_version>="3.5"  # For testing async code
 tox>=3.14.0,<4.0.0  # Last version supporting Python 2.7
 futures;python_version<"3.0"
