@@ -17,10 +17,12 @@ pip install concurrent-coalesce
 - Prevents redundant concurrent execution of functions with identical arguments
 - Works with both synchronous threads and asynchronous code (Python 3.5+)
 - Supports custom key functions for unhashable inputs and controlling how calls are grouped
-- Compatible with Python 2.7 and Python 3.5
+- Compatible with Python 2.7 and Python 3.5+
 - No external dependencies
 
 ## Usage
+
+See [examples](https://github.com/claytonsingh/concurrent-coalesce-python/tree/master/examples)
 
 ### Basic Usage
 
@@ -119,7 +121,7 @@ The decorator can be used in two ways:
 
 **Parameters:**
 - `key_func`: Optional callable that takes `*args, **kwargs` and returns a hashable key.
-  Defaults to using `(args, frozenset(kwargs.items()))`.
+  Defaults to using `(tuple(args), frozenset(kwargs.items()))`.
 - `*args`: If provided, must be a single callable that will be decorated.
   If no args are provided, returns the decorator function.
   If multiple args are provided, raises TypeError.
@@ -133,4 +135,4 @@ The decorator can be used in two ways:
 
 ## License
 
-MIT License
+[MIT License](https://github.com/claytonsingh/concurrent-coalesce-python/blob/master/LICENSE)

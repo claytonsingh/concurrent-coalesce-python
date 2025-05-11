@@ -164,7 +164,6 @@ def coalesce(key_func=None, *args):
     if len(args) == 0:
         return decorator
     elif len(args) == 1 and callable(args[0]):
-        key_func = lambda *args, **kwargs: (args, frozenset(kwargs.items()))
         return decorator(args[0])
     else:
         raise TypeError("Invalid number of arguments")
