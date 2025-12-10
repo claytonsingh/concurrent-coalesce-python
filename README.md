@@ -102,7 +102,7 @@ sequenceDiagram
   activate C
   activate F
   T2 ->> C : Call to fetch_data()
-  Note right of C: Thread 2 is blocked while<br/>Thread 1 processes fetch_data()
+  Note right of C : Thread 2 is blocked while<br/>Thread 1 processes fetch_data()
   F ->> T1 : Return from fetch_data()
   deactivate F
   C ->> T2 : Return from fetch_data()
@@ -132,6 +132,45 @@ The decorator can be used in two ways:
 
 **Raises:**
 - `TypeError`: If key_func is not callable or if multiple arguments are provided in *args
+
+## Development
+
+### Building the Package
+
+To build the package locally:
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Build the package
+./build.sh
+
+# Or manually:
+python -m build
+```
+
+### Testing the Build
+
+After building, you can test the package locally:
+
+```bash
+# Install the built package
+pip install dist/*.whl
+
+# Test the import
+python test_import.py
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=concurrent_coalesce
+```
 
 ## License
 

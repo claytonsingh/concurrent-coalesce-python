@@ -6,8 +6,10 @@ build
 toml
 
 # Testing
-pytest>=4.6.0,<7.0.0  # Last version supporting Python 2.7
+pytest>=4.6.0,<7.0.0;python_version<"3.9"  # Last version supporting Python 2.7
+pytest;python_version>="3.9"  # Last version
 pytest-cov>=2.12.1
 pytest-asyncio>=0.18.0;python_version>="3.5"  # For testing async code
-tox>=3.14.0,<4.0.0  # Last version supporting Python 2.7
+tox>=3.14.0,<4.0.0;python_version<"3.9"  # Last version supporting Python 2.7
+tox;python_version>="3.9"
 futures;python_version<"3.0"
